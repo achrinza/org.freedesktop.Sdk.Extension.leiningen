@@ -1,0 +1,42 @@
+id: org.freedesktop.Sdk.Extension.leiningen
+branch: '23.08'
+runtime: org.freedesktop.Sdk
+runtime-version: '23.08'
+sdk: org.freedesktop.Sdk
+build-extension: true
+separate-locales: false
+appstream-compose: false
+modules:
+  - name: leiningen
+    buildsystem: simple
+    sources:
+      - type: file
+        url: https://codeberg.org/leiningen/leiningen/raw/commit/795c3a5d68de7a2465582da4184c42d7bd065c76/bin/lein
+        sha256: f83e3de252cb09d301f18f1912acffa807b54c1c9a96772ae63847a946032bd4
+      - type: file
+        url: https://github.com/technomancy/leiningen/releases/download/2.11.2/leiningen-2.11.2-standalone.jar
+        sha256: 7d31ae23ae769e927438b0cd55d15a93e7dabab09fd4fc15877979161e108774
+    build-commands:
+      - install -Dm 755 lein "$FLATPAK_DEST/lib/bin/lein"
+      - install -Dm 644 leiningen-2.11.2-standalone.jar "$FLATPAK_DEST/lib/self-installs/leiningen-2.11.2-standalone.jar"
+  - name: lein-wrapper-script
+    buildsystem: simple
+    sources:
+      - type: script
+        commands:
+          - export LEIN_JAR="$FLATPAK_DEST/lib/self-installs/leiningen-2.11.2-standalone.jar"
+          - source "$FLATPAK_DEST/lib/bin/lein"
+        dest-filename: lein
+    build-commands:
+      - sed -i -e 's@$FLATPAK_DEST'"@$FLATPAK_DEST@" lein
+      - install -Dm 755 lein "$FLATPAK_DEST/bin/lein"
+  - name: enable-script
+    buildsystem: simple
+    sources:
+      - type: script
+        commands:
+          - export PATH="$PATH:$FLATPAK_DEST/bin"
+        dest-filename: enable.sh
+    build-commands:
+      - sed -i -e 's@$FLATPAK_DEST'"@$FLATPAK_DEST@" enable.sh
+      - install -m 755 enable.sh /usr/lib/sdk/leiningen/enable.sh

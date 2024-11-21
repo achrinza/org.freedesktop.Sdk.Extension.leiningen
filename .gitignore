@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: FSFAP
+
+# Flatpak
+.flatpak-builder
+builddir
+repo
+
+# Code editors
+*~
+.*.swp
+\#*#
